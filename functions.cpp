@@ -7,6 +7,7 @@
 #include <fstream>
 #include <algorithm>
 #include "functions.h"
+#include "matrix.h"
 
 using std::string;
 using std::vector;
@@ -168,7 +169,6 @@ string ASCII_to_hex(string input) {
 }
 
 string fixed_XOR(string a, string b) {
-	// strings are assumed to be equal lengths
 	assert(a.size() == b.size());
 	
 	string result = "";
@@ -288,8 +288,8 @@ string detect_single_byte_XOR(vector<string> input) {
 }
 
 int hamming_distance(string a, string b) {
-	// strings are assumed to be equal lengths
 	assert(a.size() == b.size());
+	
 	int length = a.size();
 	int dist = 0;
     
@@ -303,3 +303,22 @@ int hamming_distance(string a, string b) {
     }
 	return dist;
 }
+
+// string matrix_XOR(string a, string b) {
+// 	assert(a.size() == b.size());
+	
+// 	int size = a.size();
+// 	string c[size][size];
+// 	for (int row = 0; row < size; row++) {
+// 		for (int col = 0; col < size; col++) {
+// 			c[row][col] = a[row][col] ^ b[row][col];
+// 		}
+// 	}
+// }
+
+// string AES_decrypt(string input, string key) {
+// 	string key_matrix[4][4];
+	
+// 	// undo add round key (XOR)
+	
+// }

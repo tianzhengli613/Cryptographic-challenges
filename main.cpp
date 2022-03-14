@@ -12,6 +12,7 @@ void challenge3();
 void challenge4();
 void challenge5();
 void challenge6();
+void challenge7();
 
 int main() {
 	challenge1();
@@ -20,6 +21,7 @@ int main() {
 	challenge4();
 	challenge5();
 	challenge6();
+	challenge7();	// incomplete
 	
 	std::cout << "\n============================\n";
 	std::cout << "All assertions passed.\n";
@@ -130,4 +132,10 @@ void challenge6() {
 	std::cout << "Challenge 6: " << result << "\n\n";
 	string deciphered = hex_to_ASCII(repeating_key_XOR(input, result));
 	print_(deciphered);
+}
+
+// AES-128 in ECB mode
+void challenge7() {
+	vector<string> split_vect = split_file("C7input.txt");
+	string key = "YELLOW SUBMARINE";
 }

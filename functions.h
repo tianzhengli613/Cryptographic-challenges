@@ -21,12 +21,10 @@ string ASCII_to_base64(string input);
 string hex_to_ASCII(string hex);
 string ASCII_to_hex(string input);
 
-// takes in ASCII ciphertext
 string fixed_XOR(string a, string b);
 string repeating_key_XOR(string input, string key);
 string break_repeating_key_XOR(string input);
 
-// takes in ASCII ciphertext and deciphers it
 string get_single_byte_XOR_key(string input);
 string single_byte_XOR(string input);
 string detect_single_byte_XOR(vector<string> input);
