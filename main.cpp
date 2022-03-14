@@ -137,5 +137,10 @@ void challenge6() {
 // AES-128 in ECB mode
 void challenge7() {
 	vector<string> split_vect = split_file("C7input.txt");
+	string input = "";
+	for (int i = 0; i < split_vect.size(); i++) { input += split_vect[i]; }
 	string key = "YELLOW SUBMARINE";
+	string result = AES_decrypt(input, key);
+	
+	print_(result);
 }

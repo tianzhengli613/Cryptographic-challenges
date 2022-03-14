@@ -30,3 +30,5 @@ string single_byte_XOR(string input);
 string detect_single_byte_XOR(vector<string> input);
 
 int hamming_distance(string a, string b);
+
+string AES_decrypt(string input, string key);

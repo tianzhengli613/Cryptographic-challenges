@@ -304,21 +304,11 @@ int hamming_distance(string a, string b) {
 	return dist;
 }
 
-// string matrix_XOR(string a, string b) {
-// 	assert(a.size() == b.size());
+string AES_decrypt(string input, string key) {
+	Matrix key_(key);
 	
-// 	int size = a.size();
-// 	string c[size][size];
-// 	for (int row = 0; row < size; row++) {
-// 		for (int col = 0; col < size; col++) {
-// 			c[row][col] = a[row][col] ^ b[row][col];
-// 		}
-// 	}
-// }
-
-// string AES_decrypt(string input, string key) {
-// 	string key_matrix[4][4];
+	// undo add round key (XOR)
 	
-// 	// undo add round key (XOR)
 	
-// }
+	return "";
+}
