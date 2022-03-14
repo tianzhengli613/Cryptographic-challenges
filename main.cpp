@@ -19,7 +19,7 @@ int main() {
 	challenge3();
 	challenge4();
 	challenge5();
-	challenge6();	// incomplete
+	challenge6();
 	
 	std::cout << "\n============================\n";
 	std::cout << "All assertions passed.\n";
@@ -80,7 +80,7 @@ void challenge2() {
 // Single-byte XOR cipher
 void challenge3() {
 	string input = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
-	string result = single_byte_XOR(input);
+	string result = single_byte_XOR(hex_to_ASCII(input));
 	string desired = "Cooking MC's like a pound of bacon";
 	
 	assert(result == desired);
@@ -90,7 +90,8 @@ void challenge3() {
 
 // Detect single character XOR
 void challenge4() {
-	string result = detect_single_char_XOR("C4input.txt");
+	vector<string> split_vect = split_file("C4input.txt");
+	string result = detect_single_byte_XOR(split_vect);
 	string desired = "Now that the party is jumping\n";
 	
 	assert(result == desired);
@@ -108,7 +109,7 @@ void challenge5() {
 	assert(result == desired);													// encode
 	assert(text == hex_to_ASCII(repeating_key_XOR(hex_to_ASCII(result), key)));	// decode
 	
-	std::cout << "Challenge 5: " << result << "\n";
+	std::cout << "Challenge 5: " << result << "\n\n";
 }
 
 // Break repeating key XOR
@@ -117,10 +118,16 @@ void challenge6() {
 	string b = "wokka wokka!!!";
 	assert(hamming_distance(a, b) == 37);
 	
-	// string filename = "C6input.txt";
-	// string result = break_repeating_key_XOR(filename);
+	vector<string> split_vect = split_file("C6input.txt");
+	string input = "";
+	for (int i = 0; i < split_vect.size(); i++) { input += split_vect[i]; }
 	
-	// print_(result);
+	input = base64_to_ASCII(input);
+	string result = break_repeating_key_XOR(input);
+	string desired = "Terminator X: Bring the noise";
+	assert(result == desired);
 	
-	// std::cout << "Challenge 6: " << result << "\n";
+	std::cout << "Challenge 6: " << result << "\n\n";
+	string deciphered = hex_to_ASCII(repeating_key_XOR(input, result));
+	print_(deciphered);
 }

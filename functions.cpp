@@ -47,18 +47,18 @@ vector<string> split_file(string filename) {
 	return result;
 }
 
-string base64_to_ASCII(string input) {
+string base64_to_ASCII(string base64) {
 	// base64 table (indices 0 - 63)
 	string char_table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 	
 	string result = "";
 	int buffer_count = 0;
-	for (int i = 0; i < input.size(); i += 4) {
-		unsigned int block = char_table.find(input[i]);
+	for (int i = 0; i < base64.size(); i += 4) {
+		unsigned int block = char_table.find(base64[i]);
 		for (int j = i + 1; j < i + 4; j++) {
 			block <<= 6;
 			// is padding, ie. '='
-			if (char_table.find(input[j]) != 64) { block |= char_table.find(input[j]); }
+			if (char_table.find(base64[j]) != 64) { block |= char_table.find(base64[j]); }
 			else { buffer_count++; }
 		}
 		
@@ -186,70 +186,96 @@ string fixed_XOR(string a, string b) {
 	return result;
 }
 
-string repeating_key_XOR(string text, string key) {
+string repeating_key_XOR(string input, string key) {
 	// match key length to the input length by repeating
 	string new_key = key;
-	for (int i = 0; i < (text.size() - key.size()); i++) {
+	for (int i = 0; i < (input.size() - key.size()); i++) {
         new_key += new_key[i];
 	}
 	// perform fixed XOR, since they are now equal lengths
-	return fixed_XOR(text, new_key);
+	return fixed_XOR(input, new_key);
 }
 
-// string break_repeating_key_XOR(string filename) {
-// 	// split file by lines into a vector
-// 	vector<string> split_vect = split_file(filename);
+string break_repeating_key_XOR(string input) {
+	double smallest_score = 9999;
+	int best_keysize = 0;
+	// test keysizes from 2 to 40
+	for (int keysize = 2; keysize <= 40; keysize++) {
+		double score = 0;
+		int counter = 0;
+		for (int i = 0; i < input.size(); i += keysize) {
+			if (i + (2 * keysize) <= input.size() - 1) { 
+				score += hamming_distance(input.substr(i, keysize), input.substr(i + keysize, keysize)); 
+				counter++;
+			}
+		}
+		score /= counter;
+		score /= keysize;
+		
+		if (score < smallest_score) {
+			smallest_score = score;
+			best_keysize = keysize;
+		}
+	}
 	
-// 	// set vector to a single continuous string
-// 	string decoded = "";
-// 	for (int i = 0; i < split_vect.size(); i++) { decoded += split_vect[i]; }
-// 	decoded = base64_to_ASCII(decoded);
+	// split into the best keysize worth of blocks
+	vector<string> blocks;
+	int remainder = input.size() % best_keysize;
+	int size = input.size() - remainder;
+	for (int i = 0; i < size; i += best_keysize) {
+		blocks.push_back(input.substr(i, i + best_keysize));
+	}
+	if (remainder) { blocks.push_back(input.substr(size, remainder)); }
 	
-// 	// int potential_keysizes[40];
-// 	// int smallest_ham = 40;
-// 	// // test keysizes from 2 to 40
-// 	// for (int keysize = 2; keysize <= 40; keysize++) {
-// 	// 	int current_ham = 0;
-// 	// 	for (int i = 0; i < decoded.size(); i += keysize * 2) {
-// 	// 		current_ham += 1;
-// 	// 	}
-// 	// 	potential_keysizes[keysize] = current_ham;
-// 	// }
-// 	return decoded;
-// }
+	// transpose
+	vector<string> transposed;
+	for (int i = 0; i < best_keysize; i++) {
+		string chunk = "";
+		for (int j = 0; j < blocks.size(); j++) { chunk += blocks[j][i]; }
+		transposed.push_back(chunk);
+	}
+	
+	// single char XOR each transposed block
+	string keys;
+	for (auto & block : transposed) { keys += get_single_byte_XOR_key(block);  }
+	return keys;
+}
 
-string single_byte_XOR(string input) {
-	string deciphered_text = hex_to_ASCII(input);
+string get_single_byte_XOR_key(string input) {
 	double largest_score = 0.0;
-	string result = "";
-	
+	string best_key;
 	// generate candidates from 255 possible keys
 	for (int i = 0; i <= 255; i++) {
 		string key = "";
-		unsigned  c = i;
+		unsigned char c = i;
 		key += c;
-		string candidate = hex_to_ASCII(repeating_key_XOR(deciphered_text, key));
+		string candidate = hex_to_ASCII(repeating_key_XOR(input, key));
 		double score = freq_score(candidate);
 		
 		// find the largest score
 		if (score > largest_score) {
 			largest_score = score;
-			result = candidate;
+			best_key = key;
 		}
 	}
-	return result;
+	return best_key;
 }
 
-string detect_single_char_XOR(string filename) {
+string single_byte_XOR(string input) {
+	string key = get_single_byte_XOR_key(input);
+	return hex_to_ASCII(repeating_key_XOR(input, key));
+}
+
+string detect_single_byte_XOR(vector<string> input) {
 	// split file by lines into a vector
-	vector<string> split_vect = split_file(filename);
+	// vector<string> split_vect = split_file(filename);
 	vector<string> decoded;
 	double largest_score = 0;
 	int index;
 	
 	// decode each line
-	for (int i = 0; i < split_vect.size(); i++) {
-		string current_line = single_byte_XOR(split_vect[i]);
+	for (int i = 0; i < input.size(); i++) {
+		string current_line = single_byte_XOR(hex_to_ASCII(input[i]));
 		double score = freq_score(current_line);
 		// find the largest score
 		if (score > largest_score) {

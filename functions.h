@@ -4,6 +4,11 @@
 using std::string;
 using std::vector;
 
+// ==========================================================================================
+// 'input' implies that the text that is fed is already decrypted into ASCII form, 
+// rather than encrypted in hex or something else
+// ==========================================================================================
+
 void print_(string input);
 void print_(int input);
 
@@ -11,18 +16,19 @@ double freq_score(string text);
 
 vector<string> split_file(string filename);
 
-string base64_to_ASCII(string input);
+string base64_to_ASCII(string base64);
 string ASCII_to_base64(string input);
 string hex_to_ASCII(string hex);
 string ASCII_to_hex(string input);
 
-// takes in ASCII text and returns hex string
+// takes in ASCII ciphertext
 string fixed_XOR(string a, string b);
-string repeating_key_XOR(string text, string key);
-string break_repeating_key_XOR(string filename);
+string repeating_key_XOR(string input, string key);
+string break_repeating_key_XOR(string input);
 
-// takes in hex string to decipher into ASCII
+// takes in ASCII ciphertext and deciphers it
+string get_single_byte_XOR_key(string input);
 string single_byte_XOR(string input);
-string detect_single_char_XOR(string filename);
+string detect_single_byte_XOR(vector<string> input);
 
 int hamming_distance(string a, string b);
