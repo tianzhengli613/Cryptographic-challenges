@@ -78,7 +78,9 @@ Matrix dot(Matrix a, Matrix b) {
 	int i = 0;
 	int j = 0;
 	for (int result_index = 0; result_index < horizontal_length * vertical_length; result_index++) {
-		for (int k = 0; k < constant; k++) { result_str += a.pos(i, k) * a.pos(k, j); }
+		unsigned char current = 0x00;
+		for (int k = 0; k < constant; k++) { current += a.pos(i, k) * b.pos(k, j); }
+		result_str += current;
 		j++;
 		if (j >= vertical_length) {
 			i++;

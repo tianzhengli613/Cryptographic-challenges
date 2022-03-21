@@ -71,8 +71,50 @@ void test_matrices() {
 	assert(d.str() == "1234567812345678");
 	
 	// test matrix dot
-	Matrix e("thisisakeyofkeys", 4);
-	e.display_int();
+	string e1_str = "";
+	unsigned char c1 = 1;
+	unsigned char c2 = 2;
+	unsigned char c3 = 3;
+	unsigned char c4 = 4;
+	unsigned char c5 = 5;
+	unsigned char c6 = 6;
+	e1_str += c1;
+	e1_str += c2;
+	e1_str += c3;
+	e1_str += c4;
+	e1_str += c5;
+	e1_str += c6;
+	Matrix e1(e1_str, 3);
+	
+	string e2_str = "";
+	c1 = 7;
+	c2 = 8;
+	c3 = 9;
+	c4 = 10;
+	c5 = 11;
+	c6 = 12;
+	e2_str += c1;
+	e2_str += c2;
+	e2_str += c3;
+	e2_str += c4;
+	e2_str += c5;
+	e2_str += c6;
+	Matrix e2(e2_str, 2);
+	
+	Matrix e3 = dot(e1, e2);
+	
+	string e3_expected_str = "";
+	c1 = 58;
+	c2 = 64;
+	c3 = 139;
+	c4 = 154;
+	e3_expected_str += c1;
+	e3_expected_str += c2;
+	e3_expected_str += c3;
+	e3_expected_str += c4;
+	Matrix e3_expected(e3_expected_str, 2);
+	
+	assert(e3.str() == e3_expected.str());
 	
 	// Matrix f("1234", 4);
 	
