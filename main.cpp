@@ -116,6 +116,21 @@ void test_matrices() {
 	
 	assert(e3.str() == e3_expected.str());
 	
+	string f1_str = e1_str + e2_str;
+	c1 = 13;
+	c2 = 14;
+	c3 = 15;
+	c4 = 16;
+	f1_str += c1;
+	f1_str += c2;
+	f1_str += c3;
+	f1_str += c4;
+	
+	Matrix f1(f1_str, 4);
+	Matrix f2(e1_str.substr(0, 4), 1);
+	Matrix f3 = dot(f1, f2);
+	f3.display_int();	// expected 30, 70, 66, 150
+	
 	// Matrix f("1234", 4);
 	
 	// // https://en.wikipedia.org/wiki/Rijndael_S-box
