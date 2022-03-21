@@ -305,7 +305,7 @@ int hamming_distance(string a, string b) {
 }
 
 string AES_decrypt(string input, string key) {
-	Matrix key_(key);
+	// Matrix key_(key);
 	
 	// undo add round key (XOR)
 	

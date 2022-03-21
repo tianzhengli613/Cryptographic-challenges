@@ -1,8 +1,9 @@
-// clang++ main.cpp -o run functions.cpp
+// clang++ main.cpp -o run functions.cpp matrix.cpp
 
 #include <iostream>
 #include <assert.h>
 #include "functions.h"
+#include "matrix.h"
 
 using std::string;
 
@@ -14,19 +15,68 @@ void challenge5();
 void challenge6();
 void challenge7();
 
+void test_matrices();
+
 int main() {
-	challenge1();
-	challenge2();
-	challenge3();
-	challenge4();
-	challenge5();
-	challenge6();
-	challenge7();	// incomplete
+	// challenge1();
+	// challenge2();
+	// challenge3();
+	// challenge4();
+	// challenge5();
+	// challenge6();
+	// challenge7();	// incomplete
+	
+	test_matrices();
 	
 	std::cout << "\n============================\n";
 	std::cout << "All assertions passed.\n";
 	
 	return 0;
+}
+
+void test_matrices() {
+	// http://etutorials.org/Networking/802.11+security.+wi-fi+protected+access+and+802.11i/Appendixes/Appendix+A.+Overview+of+the+AES+Block+Cipher/Steps+in+the+AES+Encryption+Process/#:~:text=AES%20defines%20a%20table%20of,value%20from%20the%20substitution%20table.
+	// https://www.simplilearn.com/tutorials/cryptography-tutorial/aes-encryption
+	
+	// 1234567812345678
+	// thisisakeyofkeys
+	// YELLOW SUBMARINE
+	
+	// test all Matrix class functions
+	Matrix empty(3, 4);
+	assert(empty.horizontal_length() == 3);
+	assert(empty.vertical_length() == 4);
+	assert(empty.str() == "            ");
+	assert((empty.str()).size() == 12);
+	
+	Matrix a("thisisakeyofkeys", 8);
+	assert(a.str() == "thisisakeyofkeys");
+	assert(a.pos(1, 2) == 'o');
+	a.set('K', 0, 7);
+	a.set('O', 1, 2);
+	assert(a.str() == "thisisaKeyOfkeys");
+	// =====================================
+	
+	// Matrix XOR
+	Matrix b("YELLOW SUBMARINE", 8);
+	Matrix c = matrix_XOR(b, a);
+	c = matrix_XOR(c, a);
+	assert(c.str() == b.str());
+	
+	// test shift and unshift rows
+	Matrix d("1234567812345678", 4);
+	d = shift_rows(d);
+	assert(d.str() == "1234856734126785");
+	d = unshift_rows(d);
+	assert(d.str() == "1234567812345678");
+	
+	// Matrix e("1234", 4);
+	
+	// // https://en.wikipedia.org/wiki/Rijndael_S-box
+	// // convert to ASCII
+	// string rijndael = "637c777bf26b6fc53001672bfed7ab76ca82c97dfa5947f0add4a2af9ca472c0b7fd9326363ff7cc34a5e5f171d8311504c723c31896059a071280e2eb27b27509832c1a1b6e5aa0523bd6b329e32f8453d100ed20fcb15b6acbbe394a4c58cfd0efaafb434d338545f9027f503c9fa851a3408f929d38f5bcb6da2110fff3d2cd0c13ec5f974417c4a77e3d645d197360814fdc222a908846eeb814de5e0bdbe0323a0a4906245cc2d3ac629195e479e7c8376d8dd54ea96c56f4ea657aae08ba78252e1ca6b4c6e8dd741f4bbd8b8a703eb5664803f60e613557b986c11d9ee1f8981169d98e949b1e87e9ce5528df8ca1890dbfe6426841992d0fb054bb16";
+	// Matrix rijndael_Sbox(rijndael, 16);
+	// rijndael_Sbox.display();
 }
 
 // =======================================
