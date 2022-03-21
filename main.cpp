@@ -70,7 +70,11 @@ void test_matrices() {
 	d = unshift_rows(d);
 	assert(d.str() == "1234567812345678");
 	
-	// Matrix e("1234", 4);
+	// test matrix dot
+	Matrix e("thisisakeyofkeys", 4);
+	e.display_int();
+	
+	// Matrix f("1234", 4);
 	
 	// // https://en.wikipedia.org/wiki/Rijndael_S-box
 	// // convert to ASCII

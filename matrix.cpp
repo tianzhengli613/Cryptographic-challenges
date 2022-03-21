@@ -42,6 +42,15 @@ void Matrix::display() {
 	}
 }
 
+void Matrix::display_int() {
+	for (int row_index = 0; row_index < vertical_length_; row_index++) {
+	    for (int col_index = 0; col_index < horizontal_length_; col_index++) {
+			std::cout << int(matrix_[row_index][col_index]) << " ";
+		}
+		std::cout << "\n";
+	}
+}
+
 string Matrix::str() {
     string result = ""; 
     for (int i = 0; i < vertical_length_; i++) {
@@ -58,20 +67,28 @@ int Matrix::vertical_length() { return vertical_length_; }
 // ================================================================
 // Matrix functions
 
-// Matrix dot(Matrix a, Matrix b) {
-//     assert(a.horizontal_length() == b.vertical_length());
-//     int horizontal_length = b.horizontal_length();
-//     int vertical_length = a.vertical_length();
+Matrix dot(Matrix a, Matrix b) {
+    assert(a.horizontal_length() == b.vertical_length());
+	int constant = a.horizontal_length();
+    int horizontal_length = b.horizontal_length();
+    int vertical_length = a.vertical_length();
     
-//     // Matrix result(horizontal_length, vertical_length);
-//     int horizontal = 0;
-//     int vertical = 0;
-//     for (int result_index = 0; result_index < horizontal_length * vertical_length; result_index++) {
-        
-//     }
+    // Matrix result(horizontal_length, vertical_length);
+	string result_str = "";
+	int i = 0;
+	int j = 0;
+	for (int result_index = 0; result_index < horizontal_length * vertical_length; result_index++) {
+		for (int k = 0; k < constant; k++) { result_str += a.pos(i, k) * a.pos(k, j); }
+		j++;
+		if (j >= vertical_length) {
+			i++;
+			j = 0;
+		}
+	}
     
-//     return result;
-// }
+	assert(result_str.size() % horizontal_length == 0);
+    return Matrix(result_str, horizontal_length);
+}
 
 Matrix matrix_XOR(Matrix a, Matrix b) {
     assert(a.horizontal_length() == b.horizontal_length());

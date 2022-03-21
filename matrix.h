@@ -19,6 +19,7 @@ class Matrix {
 		Matrix(int horizontal_length, int vertical_length);
 		
 		void display();
+		void display_int();
 		string str();
 		
 		unsigned char pos(int vertical, int horizontal);
