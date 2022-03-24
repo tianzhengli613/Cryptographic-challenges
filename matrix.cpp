@@ -6,6 +6,8 @@
 using std::string;
 using std::vector;
 
+#define ROTL8(x,shift) ((uint8_t) ((x) << (shift)) | ((x) >> (8 - (shift))))
+
 // Initializers
 
 Matrix::Matrix(string input, int horizontal_length) {
@@ -105,6 +107,45 @@ Matrix matrix_XOR(Matrix a, Matrix b) {
 		}
 	}
 	return Matrix(result, horizontal_length);
+}
+
+Matrix initialize_aes_sbox() {
+    unsigned char sbox[256];
+	uint8_t p = 1, q = 1;
+	
+	/* loop invariant: p * q == 1 in the Galois field */
+	do {
+		/* multiply p by 3 */
+		p = p ^ (p << 1) ^ (p & 0x80 ? 0x1B : 0);
+
+		/* divide q by 3 (equals multiplication by 0xf6) */
+		q ^= q << 1;
+		q ^= q << 2;
+		q ^= q << 4;
+		q ^= q & 0x80 ? 0x09 : 0;
+
+		/* compute the affine transformation */
+		uint8_t xformed = q ^ ROTL8(q, 1) ^ ROTL8(q, 2) ^ ROTL8(q, 3) ^ ROTL8(q, 4);
+
+		sbox[p] = xformed ^ 0x63;
+	} while (p != 1);
+
+	/* 0 is a special case since it has no inverse */
+	sbox[0] = 0x63;
+    
+    string sbox_str = "";
+	for (auto i : sbox) { sbox_str += i; }
+    return Matrix(sbox_str, 16);
+}
+
+Matrix matrix_sub_bytes(Matrix initial) {
+    // initialize sbox into a matrix
+    Matrix sbox = initialize_aes_sbox();
+    
+    // convert each byte into a vector of the hex
+    
+    // substitute each through the S-box
+    return sbox;
 }
 
 Matrix shift_rows(Matrix initial) {

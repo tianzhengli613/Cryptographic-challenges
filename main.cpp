@@ -142,6 +142,10 @@ void test_matrices() {
 	Matrix f3_expected(f3_str, 1);
 	assert(f3.str() == f3_expected.str());
 	
+	// test sub-bytes
+	Matrix sbox = initialize_aes_sbox();
+	sbox.display_int();
+	
 	// Matrix f("1234", 4);
 	
 	// // https://en.wikipedia.org/wiki/Rijndael_S-box
