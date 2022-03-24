@@ -129,7 +129,18 @@ void test_matrices() {
 	Matrix f1(f1_str, 4);
 	Matrix f2(e1_str.substr(0, 4), 1);
 	Matrix f3 = dot(f1, f2);
-	f3.display_int();	// expected 30, 70, 66, 150
+	
+	string f3_str = "";
+	c1 = 30;
+	c2 = 70;
+	c3 = 110;
+	c4 = 150;
+	f3_str += c1;
+	f3_str += c2;
+	f3_str += c3;
+	f3_str += c4;
+	Matrix f3_expected(f3_str, 1);
+	assert(f3.str() == f3_expected.str());
 	
 	// Matrix f("1234", 4);
 	

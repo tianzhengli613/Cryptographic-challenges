@@ -82,7 +82,7 @@ Matrix dot(Matrix a, Matrix b) {
 		for (int k = 0; k < constant; k++) { current += a.pos(i, k) * b.pos(k, j); }
 		result_str += current;
 		j++;
-		if (j >= vertical_length) {
+		if (j >= horizontal_length) {
 			i++;
 			j = 0;
 		}
