@@ -6,7 +6,7 @@ using std::vector;
 
 // ==========================================================================================
 // 'input' implies that the text that is fed is already decrypted into ASCII form, 
-// rather than encrypted in hex or something else
+// rather than encrypted in hex, etc. Same applies to the output.
 // ==========================================================================================
 
 void print_(string input);
@@ -31,4 +31,4 @@ string detect_single_byte_XOR(vector<string> input);
 
 int hamming_distance(string a, string b);
 
-string AES_decrypt(string input, string key);
+string AES_encrypt(string input, string key);

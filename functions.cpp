@@ -156,9 +156,9 @@ string ASCII_to_hex(string input) {
 	string result = "";
 	for (auto & c : input) {
 		// convert
-		int x = c;
+		unsigned char ch = c;
 		std::stringstream stream;
-		stream << std::hex << x;
+		stream << std::hex << int(ch);
 		string temp = stream.str();
 		
 		// pad with 0
@@ -175,13 +175,14 @@ string fixed_XOR(string a, string b) {
 	for (int i = 0; i < a.size(); i++) {
 		// XOR and convert
 		int xored = a[i] ^ b[i];
-		std::stringstream stream;
-		stream << std::hex << xored;
-		string temp = stream.str();
+		// std::stringstream stream;
+		// stream << std::hex << xored;
+		// string temp = stream.str();
 		
-		// pad with 0
-		if (temp.size() < 2) { temp = "0" + temp; }
-		result += temp;
+		// // pad with 0
+		// if (temp.size() < 2) { temp = "0" + temp; }
+		// result += temp;
+		result += xored;
 	}
 	return result;
 }
@@ -304,11 +305,33 @@ int hamming_distance(string a, string b) {
 	return dist;
 }
 
-string AES_decrypt(string input, string key) {
-	// Matrix key_(key);
+string AES_encrypt(string input, string key) {
+	assert(input.size() == 16 && key.size() == 16);
 	
-	// undo add round key (XOR)
+	// generate keys
+	vector<string> keys;
+	keys.push_back(key);
+	Matrix prev_key(key, 4);
+	for(int i = 0; i < 9; i++) {
+		Matrix new_key = sub_bytes(prev_key);
+		new_key = shift_rows(new_key);
+		new_key = mix_columns(new_key);
+		keys.push_back(new_key.str());
+		prev_key = new_key;
+	}
+	// last key does not include mix columns
+	Matrix last_key(prev_key.str(), 4);
+	last_key = sub_bytes(last_key);
+	last_key = shift_rows(last_key);
+	keys.push_back(last_key.str());
 	
+	// encrypt the plaintext with the 11 keys, 
+	// 1 initial, 10 with all 3 functions, and 1 last one without mix columns
+	assert(keys.size() == 11);
+	string result = input;
+	for (int i = 0; i < keys.size(); i++) {
+		result = fixed_XOR(result, keys[i]);
+	}
 	
-	return "";
+	return result;
 }

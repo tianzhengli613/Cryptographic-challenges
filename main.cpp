@@ -1,4 +1,4 @@
-// clang++ main.cpp -o run functions.cpp matrix.cpp
+// clang++ main.cpp -o run functions.cpp matrix.cpp && ./run
 
 #include <iostream>
 #include <assert.h>
@@ -24,9 +24,9 @@ int main() {
 	// challenge4();
 	// challenge5();
 	// challenge6();
-	// challenge7();	// incomplete
+	challenge7();	// incomplete
 	
-	test_matrices();
+	// test_matrices();
 	
 	std::cout << "\n============================\n";
 	std::cout << "All assertions passed.\n";
@@ -62,13 +62,6 @@ void test_matrices() {
 	Matrix c = matrix_XOR(b, a);
 	c = matrix_XOR(c, a);
 	assert(c.str() == b.str());
-	
-	// test shift and unshift rows
-	Matrix d("1234567812345678", 4);
-	d = shift_rows(d);
-	assert(d.str() == "1234856734126785");
-	d = unshift_rows(d);
-	assert(d.str() == "1234567812345678");
 	
 	// test matrix dot
 	string e1_str = "";
@@ -141,18 +134,6 @@ void test_matrices() {
 	f3_str += c4;
 	Matrix f3_expected(f3_str, 1);
 	assert(f3.str() == f3_expected.str());
-	
-	// test sub-bytes
-	Matrix sbox = initialize_aes_sbox();
-	sbox.display_int();
-	
-	// Matrix f("1234", 4);
-	
-	// // https://en.wikipedia.org/wiki/Rijndael_S-box
-	// // convert to ASCII
-	// string rijndael = "637c777bf26b6fc53001672bfed7ab76ca82c97dfa5947f0add4a2af9ca472c0b7fd9326363ff7cc34a5e5f171d8311504c723c31896059a071280e2eb27b27509832c1a1b6e5aa0523bd6b329e32f8453d100ed20fcb15b6acbbe394a4c58cfd0efaafb434d338545f9027f503c9fa851a3408f929d38f5bcb6da2110fff3d2cd0c13ec5f974417c4a77e3d645d197360814fdc222a908846eeb814de5e0bdbe0323a0a4906245cc2d3ac629195e479e7c8376d8dd54ea96c56f4ea657aae08ba78252e1ca6b4c6e8dd741f4bbd8b8a703eb5664803f60e613557b986c11d9ee1f8981169d98e949b1e87e9ce5528df8ca1890dbfe6426841992d0fb054bb16";
-	// Matrix rijndael_Sbox(rijndael, 16);
-	// rijndael_Sbox.display();
 }
 
 // =======================================
@@ -199,8 +180,8 @@ void challenge2() {
 	string result = fixed_XOR(aa, bb);
 	string desired = "746865206b696420646f6e277420706c6179";
 	
-	assert(result == desired);							// encode
-	assert(fixed_XOR(hex_to_ASCII(result), bb) == a);	// decode
+	assert(ASCII_to_hex(result) == desired);	// encode
+	assert(fixed_XOR(result, bb) == a);			// decode
 	
 	std::cout << "Challenge 2: " << result << "\n";
 }
@@ -262,11 +243,44 @@ void challenge6() {
 
 // AES-128 in ECB mode
 void challenge7() {
-	vector<string> split_vect = split_file("C7input.txt");
-	string input = "";
-	for (int i = 0; i < split_vect.size(); i++) { input += split_vect[i]; }
-	string key = "YELLOW SUBMARINE";
-	string result = AES_decrypt(input, key);
+	// vector<string> split_vect = split_file("C7input.txt");
+	// string input = "";
+	// for (int i = 0; i < split_vect.size(); i++) { input += split_vect[i]; }
+	// string key = "YELLOW SUBMARINE";
+	// string result = AES_decrypt(input, key);
 	
-	print_(result);
+	// print_(result);
+	
+	// test sub-bytes
+	Matrix test("Thats my Kung Fu", 4);
+	Matrix sub_bytes_result = sub_bytes(test);
+	string sub_bytes_expected = "2045ef928fb73cb6b7b39d9f85b75a9d";
+	assert(ASCII_to_hex(sub_bytes_result.str()) == sub_bytes_expected);
+	
+	// test shift and unshift rows
+	Matrix shift_rows_result = shift_rows(sub_bytes_result);
+	string shift_rows_expected = "2045ef92b73cb68f9d9fb7b39d85b75a";
+	assert(ASCII_to_hex(shift_rows_result.str()) == shift_rows_expected);
+	Matrix unshift_rows_result = unshift_rows(shift_rows_result);
+	assert(ASCII_to_hex(unshift_rows_result.str()) == ASCII_to_hex(sub_bytes_result.str()));
+	
+	// test mix columns
+	string mix_column_input = hex_to_ASCII("dbf201c6130a01c6532201c6455c01c6");
+	Matrix mix_column_result(mix_column_input, 4);
+	mix_column_result = mix_columns(mix_column_result);
+	string mix_column_expected = "8e9f01c64ddc01c6a15801c6bc9d01c6";
+	assert(ASCII_to_hex(mix_column_result.str()) == mix_column_expected);
+	
+	// test AES
+	string plaintext = "Two One Nine Two";
+	string key = "Thats my Kung Fu";
+	string AES_result = AES_encrypt(plaintext, key);
+	string AES_expected_hex = "29c3505f571420f6402299b31a02d73ab3e46f11ba8d2b97c18769449a89e868";
+	// assert(ASCII_to_hex(AES_result) == AES_expected_hex);
+	print_(ASCII_to_hex(AES_result));
+	
+	// string test1_str = hex_to_ASCII("2045ef92b73cb68f9d9fb7b39d85b75a");
+	// Matrix test1(test1_str, 4);
+	// test1 = mix_columns(test1);
+	// test1.display_hex();
 }
