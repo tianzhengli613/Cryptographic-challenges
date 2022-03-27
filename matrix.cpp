@@ -127,7 +127,6 @@ Matrix dot(Matrix a, Matrix b) {
 	int horizontal_length = b.horizontal_length();
 	int vertical_length = a.vertical_length();
 	
-	// Matrix result(horizontal_length, vertical_length);
 	string result_str = "";
 	int i = 0;
 	int j = 0;
@@ -135,8 +134,7 @@ Matrix dot(Matrix a, Matrix b) {
 		unsigned char current = 0x00;
 		for (int k = 0; k < constant; k++) { current += a.pos(i, k) * b.pos(k, j); }
 		result_str += current;
-		j++;
-		if (j >= horizontal_length) {
+		if (++j >= horizontal_length) {
 			i++;
 			j = 0;
 		}
@@ -258,7 +256,7 @@ unsigned char sbox[256] = {
 };
 
 // inverse S-box table
-unsigned char inv_sbox[256] = {
+unsigned char inverse_sbox[256] = {
 	0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5, 0x38, 0xBF, 0x40, 0xA3, 0x9E, 0x81, 0xF3, 0xD7, 0xFB,
 	0x7C, 0xE3, 0x39, 0x82, 0x9B, 0x2F, 0xFF, 0x87, 0x34, 0x8E, 0x43, 0x44, 0xC4, 0xDE, 0xE9, 0xCB,
 	0x54, 0x7B, 0x94, 0x32, 0xA6, 0xC2, 0x23, 0x3D, 0xEE, 0x4C, 0x95, 0x0B, 0x42, 0xFA, 0xC3, 0x4E,
@@ -302,6 +300,38 @@ Matrix sub_bytes(Matrix initial) {
 		
 		int index = vertical_index * 16 + horizontal_index;
 		result_str += sbox[index];
+	} 
+	
+	assert(result_str.size() == (initial.str()).size());
+	return Matrix(result_str, initial.horizontal_length());
+}
+
+
+Matrix inverse_sub_bytes(Matrix initial) {
+	// convert each byte into a vector of the hex
+	vector<string> hex_vect;
+	for (auto & c : initial.str()) {
+		string temp_ch = "";
+		temp_ch += c;
+		hex_vect.push_back(ASCII_to_hex(temp_ch));
+	}
+	
+	// substitute each through the S-box
+	string result_str = "";
+	for (int i = 0; i < hex_vect.size(); i++) {
+		unsigned char vertical = hex_vect[i][0];
+		unsigned char horizontal = hex_vect[i][1];
+		
+		int vertical_index = 0;
+		if (int(vertical) >= 48 && int(vertical) <= 57) { vertical_index = int(vertical) - 48; }
+		else if (int(vertical) >= 97 && int(vertical) <= 102) { vertical_index = int(vertical) - 87; }
+		
+		int horizontal_index = 0;
+		if (int(horizontal) >= 48 && int(horizontal) <= 57) { horizontal_index = int(horizontal) - 48; }
+		else if (int(horizontal) >= 97 && int(horizontal) <= 102) { horizontal_index = int(horizontal) - 87; }
+		
+		int index = vertical_index * 16 + horizontal_index;
+		result_str += inverse_sbox[index];
 	} 
 	
 	assert(result_str.size() == (initial.str()).size());
@@ -380,16 +410,28 @@ Matrix byte_multiplication(Matrix a, Matrix b) {
 	int horizontal_length = b.horizontal_length();
 	int vertical_length = a.vertical_length();
 	
-	// Matrix result(horizontal_length, vertical_length);
 	string result_str = "";
 	int i = 0;
 	int j = 0;
 	for (int result_index = 0; result_index < horizontal_length * vertical_length; result_index++) {
 		unsigned char current = 0x00;
-		for (int k = 0; k < constant; k++) { current ^= a.pos(i, k) * b.pos(k, j); }
+		unsigned char bin = 0b10000000;
+		for (int k = 0; k < constant; k++) {
+			if (a.pos(i, k) == 0x02) {
+				unsigned char temp = b.pos(k, j) << 1;
+				if ((b.pos(k, j) | bin) == b.pos(k, j)) { temp ^= 0x1b; }	// if leftmost bit is 1
+				current ^= temp;
+			}
+			if (a.pos(i, k) == 0x03) {
+				unsigned char temp = b.pos(k, j) << 1;
+				if ((b.pos(k, j) | bin) == b.pos(k, j)) { temp ^= 0x1b; }	// if leftmost bit is 1
+				temp ^= b.pos(k, j);
+				current ^= temp;
+			}
+			if (a.pos(i, k) == 0x01) { current ^= b.pos(k, j); }
+		}
 		result_str += current;
-		j++;
-		if (j >= horizontal_length) {
+		if (++j >= horizontal_length) {
 			i++;
 			j = 0;
 		}
@@ -416,29 +458,25 @@ void gmix_column(unsigned char *r) {
 	r[3] = b[3] ^ a[2] ^ a[1] ^ b[0] ^ a[0]; 
 }
 
+// revised
 Matrix mix_columns(Matrix initial) {
 	// only works for 4x4 matrix
 	assert(initial.horizontal_length() == 4);
 	assert(initial.vertical_length() == 4);
 	
-	string col1 = get_column(initial, 0).str();
-	string col2 = get_column(initial, 1).str();
-	string col3 = get_column(initial, 2).str();
-	string col4 = get_column(initial, 3).str();
+	unsigned char constants_ch[16] = {
+		0x02, 0x03, 0x01, 0x01, 
+		0x01, 0x02, 0x03, 0x01,
+		0x01, 0x01, 0x02, 0x03,
+		0x03, 0x01, 0x01, 0x02
+	};
+	Matrix constants(constants_ch, 16, 4);
 	
-	unsigned char col1_mixed[4] = {(unsigned char)col1[0], (unsigned char)col1[1], (unsigned char)col1[2], (unsigned char)col1[3]};
-	gmix_column(col1_mixed);
-	unsigned char col2_mixed[4] = {(unsigned char)col2[0], (unsigned char)col2[1], (unsigned char)col2[2], (unsigned char)col2[3]};
-	gmix_column(col2_mixed);
-	unsigned char col3_mixed[4] = {(unsigned char)col3[0], (unsigned char)col3[1], (unsigned char)col3[2], (unsigned char)col3[3]};
-	gmix_column(col3_mixed);
-	unsigned char col4_mixed[4] = {(unsigned char)col4[0], (unsigned char)col4[1], (unsigned char)col4[2], (unsigned char)col4[3]};
-	gmix_column(col4_mixed);
-	
-	Matrix result(4, 4);
-	result = set_column(result, Matrix(col1_mixed, 4, 1), 0);
-	result = set_column(result, Matrix(col2_mixed, 4, 1), 1);
-	result = set_column(result, Matrix(col3_mixed, 4, 1), 2);
-	result = set_column(result, Matrix(col4_mixed, 4, 1), 3);
-	return result;
+	return byte_multiplication(constants, initial);
 }
+
+// Matrix inverse_mix_columns(Matrix initial) {
+// 	// only works for 4x4 matrix
+// 	assert(initial.horizontal_length() == 4);
+// 	assert(initial.vertical_length() == 4);
+// }

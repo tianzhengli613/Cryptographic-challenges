@@ -48,14 +48,13 @@ vector<string> key_expansion(string key);
 
 // Step 1: Sub-bytes
 Matrix sub_bytes(Matrix initial);
+Matrix inverse_sub_bytes(Matrix initial);
 
 // Step 2: Shift rows
 Matrix shift_rows(Matrix initial);
 Matrix unshift_rows(Matrix initial);
 
 // Step 3: Mix columns
-Matrix byte_multiplication(Matrix a, Matrix b);	// same as dot but rather than adding the decimal values
-												// they are xored after multiplication
-void gmix_column(unsigned char *r);		// modified from code provided by Wikipedia: 
-										// https://en.wikipedia.org/wiki/Rijndael_MixColumns 
+Matrix byte_multiplication(Matrix a, Matrix b);
 Matrix mix_columns(Matrix initial);
+Matrix inverse_mix_columns(Matrix initial);

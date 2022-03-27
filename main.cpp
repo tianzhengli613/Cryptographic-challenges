@@ -276,16 +276,17 @@ void challenge7() {
 	string sub_bytes_expected = hex_to_ASCII("8a84eb01");
 	assert(sub_bytes_result.str() == sub_bytes_expected);
 	
-	// test sub-bytes
-	sub_bytes_result = sub_bytes(test_key);
-	sub_bytes_expected = "2045ef928fb73cb6b7b39d9f85b75a9d";
-	assert(ASCII_to_hex(sub_bytes_result.str()) == sub_bytes_expected);
-	
+	// test sub-bytes and inverse sub-bytes
 	string pre_sub = "19a09ae93df4c6f8e3e28d48be2b2a08";
 	sub_bytes_result = sub_bytes(Matrix(hex_to_ASCII(pre_sub), 4));
 	sub_bytes_expected = "d4e0b81e27bfb44111985d52aef1e530";
 	assert(ASCII_to_hex(sub_bytes_result.str()) == sub_bytes_expected);
+	Matrix inverse_sub_result = inverse_sub_bytes(sub_bytes_result);
+	assert(inverse_sub_result.str() == hex_to_ASCII(pre_sub));
+	
 	sub_bytes_result = sub_bytes(test_key);
+	sub_bytes_expected = "2045ef928fb73cb6b7b39d9f85b75a9d";
+	assert(ASCII_to_hex(sub_bytes_result.str()) == sub_bytes_expected);
 	
 	// test shift and unshift rows
 	Matrix shift_rows_result = shift_rows(sub_bytes_result);
@@ -327,5 +328,6 @@ void challenge7() {
 	// string AES_expected_hex = "29c3505f571420f6402299b31a02d73ab3e46f11ba8d2b97c18769449a89e868";
 	string AES_expected_hex = "29c3505f571420f6402299b31a02d73a";
 	assert(ASCII_to_hex(AES_result) == AES_expected_hex);
+	
 	print_(ASCII_to_hex(AES_result));
 }
