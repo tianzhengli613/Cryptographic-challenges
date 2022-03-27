@@ -55,6 +55,13 @@ void test_matrices() {
 	a.set('K', 0, 7);
 	a.set('O', 1, 2);
 	assert(a.str() == "thisisaKeyOfkeys");
+	
+	// test matrix set column
+	Matrix set_col_result("o1l2d3c4", 2);
+	Matrix new_column("NEWC", 1);
+	set_col_result = set_column(set_col_result, new_column, 0);
+	string set_col_expected = "N1E2W3C4";
+	assert(set_col_result.str() == set_col_expected);
 	// =====================================
 	
 	// Matrix XOR
@@ -134,6 +141,13 @@ void test_matrices() {
 	f3_str += c4;
 	Matrix f3_expected(f3_str, 1);
 	assert(f3.str() == f3_expected.str());
+	
+	// test matrix transpose
+	Matrix pre_transpose("123456", 3);
+	Matrix post_transpose = transpose(pre_transpose);
+	assert(post_transpose.str() == "142536");
+	assert(post_transpose.vertical_length() == pre_transpose.horizontal_length());
+	assert(post_transpose.horizontal_length() == pre_transpose.vertical_length());
 }
 
 // =======================================
@@ -251,11 +265,27 @@ void challenge7() {
 	
 	// print_(result);
 	
+	Matrix test_key("Thats my Kung Fu", 4);
+	
+	// test key expansion
+	Matrix test_key_expansion = get_column(test_key, 0);
+	test_key_expansion = rot_word(test_key_expansion);
+	Matrix rot_word_expected(hex_to_ASCII("73206754"), 1);
+	assert(rot_word_expected.str() == test_key_expansion.str());
+	Matrix sub_bytes_result = sub_bytes(Matrix(hex_to_ASCII("cf4f3c09"), 1));
+	string sub_bytes_expected = hex_to_ASCII("8a84eb01");
+	assert(sub_bytes_result.str() == sub_bytes_expected);
+	
 	// test sub-bytes
-	Matrix test("Thats my Kung Fu", 4);
-	Matrix sub_bytes_result = sub_bytes(test);
-	string sub_bytes_expected = "2045ef928fb73cb6b7b39d9f85b75a9d";
+	sub_bytes_result = sub_bytes(test_key);
+	sub_bytes_expected = "2045ef928fb73cb6b7b39d9f85b75a9d";
 	assert(ASCII_to_hex(sub_bytes_result.str()) == sub_bytes_expected);
+	
+	string pre_sub = "19a09ae93df4c6f8e3e28d48be2b2a08";
+	sub_bytes_result = sub_bytes(Matrix(hex_to_ASCII(pre_sub), 4));
+	sub_bytes_expected = "d4e0b81e27bfb44111985d52aef1e530";
+	assert(ASCII_to_hex(sub_bytes_result.str()) == sub_bytes_expected);
+	sub_bytes_result = sub_bytes(test_key);
 	
 	// test shift and unshift rows
 	Matrix shift_rows_result = shift_rows(sub_bytes_result);
@@ -264,6 +294,13 @@ void challenge7() {
 	Matrix unshift_rows_result = unshift_rows(shift_rows_result);
 	assert(ASCII_to_hex(unshift_rows_result.str()) == ASCII_to_hex(sub_bytes_result.str()));
 	
+	string pre_shift = hex_to_ASCII("d4e0b81e27bfb44111985d52aef1e530");
+	shift_rows_result = shift_rows(Matrix(pre_shift, 4));
+	shift_rows_expected = "d4e0b81ebfb441275d52119830aef1e5";
+	assert(ASCII_to_hex(shift_rows_result.str()) == shift_rows_expected);
+	unshift_rows_result = unshift_rows(shift_rows_result);
+	assert(unshift_rows_result.str() == pre_shift);
+	
 	// test mix columns
 	string mix_column_input = hex_to_ASCII("dbf201c6130a01c6532201c6455c01c6");
 	Matrix mix_column_result(mix_column_input, 4);
@@ -271,16 +308,24 @@ void challenge7() {
 	string mix_column_expected = "8e9f01c64ddc01c6a15801c6bc9d01c6";
 	assert(ASCII_to_hex(mix_column_result.str()) == mix_column_expected);
 	
+	mix_column_input = hex_to_ASCII("d4e0b81ebfb441275d52119830aef1e5");
+	mix_column_result = Matrix(mix_column_input, 4);
+	mix_column_result = mix_columns(mix_column_result);
+	mix_column_expected = "04e0482866cbf8068119d326e59a7a4c";
+	assert(ASCII_to_hex(mix_column_result.str()) == mix_column_expected);
+	
+	// test matrix XOR
+	test_key = Matrix(hex_to_ASCII("a088232afa54a36cfe2c397617b13905"), 4);
+	Matrix XOR_result = matrix_XOR(mix_column_result, test_key);
+	Matrix XOR_expected(hex_to_ASCII("a4686b029c9f5b6a7f35ea50f22b4349"), 4);
+	assert(XOR_result.str() == XOR_expected.str());
+	
 	// test AES
 	string plaintext = "Two One Nine Two";
 	string key = "Thats my Kung Fu";
 	string AES_result = AES_encrypt(plaintext, key);
-	string AES_expected_hex = "29c3505f571420f6402299b31a02d73ab3e46f11ba8d2b97c18769449a89e868";
-	// assert(ASCII_to_hex(AES_result) == AES_expected_hex);
+	// string AES_expected_hex = "29c3505f571420f6402299b31a02d73ab3e46f11ba8d2b97c18769449a89e868";
+	string AES_expected_hex = "29c3505f571420f6402299b31a02d73a";
+	assert(ASCII_to_hex(AES_result) == AES_expected_hex);
 	print_(ASCII_to_hex(AES_result));
-	
-	// string test1_str = hex_to_ASCII("2045ef92b73cb68f9d9fb7b39d85b75a");
-	// Matrix test1(test1_str, 4);
-	// test1 = mix_columns(test1);
-	// test1.display_hex();
 }

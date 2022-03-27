@@ -11,11 +11,16 @@ class Matrix {
 		vector<vector<unsigned char>> matrix_;
 		
 	public:
-		// Initialize a X x Y Matrix by the input and X length
+		// Initialize a X x Y Matrix by the input and horizontal X length
 		// the Y will be automatically be determined
 		Matrix(string input, int horizontal_length);
 		
-		// Or you can initialize an empty X x Y Matrix with X length and Y length
+		// or instead with unsigned char array for an X x Y matrix
+		// by including the size and desired horizontal X length
+		Matrix(unsigned char * input, int size, int horizontal_length);
+		
+		// or you can initialize an empty X x Y Matrix with 
+		// horizontal X length and vertical Y length
 		Matrix(int horizontal_length, int vertical_length);
 		
 		void display();
@@ -28,20 +33,20 @@ class Matrix {
 		
 		int horizontal_length();
 		int vertical_length();
-		
-		// void add_column(string col);
 		 
 };
 
-Matrix dot(Matrix a, Matrix b);
+Matrix set_column(Matrix initial, Matrix col, int col_num);
+Matrix get_column(Matrix initial, int col);
 
+Matrix dot(Matrix a, Matrix b);
+Matrix transpose(Matrix initial);
 Matrix matrix_XOR(Matrix a, Matrix b);
 
+Matrix rot_word(Matrix initial);
 vector<string> key_expansion(string key);
 
 // Step 1: Sub-bytes
-Matrix initialize_aes_sbox();			// modified from code provided by Wikipedia: 
-										// https://en.wikipedia.org/wiki/Rijndael_S-box
 Matrix sub_bytes(Matrix initial);
 
 // Step 2: Shift rows
@@ -51,7 +56,6 @@ Matrix unshift_rows(Matrix initial);
 // Step 3: Mix columns
 Matrix byte_multiplication(Matrix a, Matrix b);	// same as dot but rather than adding the decimal values
 												// they are xored after multiplication
-Matrix get_column(Matrix initial, int col);
 void gmix_column(unsigned char *r);		// modified from code provided by Wikipedia: 
 										// https://en.wikipedia.org/wiki/Rijndael_MixColumns 
 Matrix mix_columns(Matrix initial);

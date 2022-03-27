@@ -14,6 +14,7 @@ using std::vector;
 
 void print_(string input) { std::cout << input << "\n"; }
 void print_(int input) { std::cout << input << "\n"; }
+void print_() { std::cout << "\n"; }
 
 // Frequency scores of alphabetic characters and space
 static std::map<char, double> english_freq = { 
@@ -173,15 +174,7 @@ string fixed_XOR(string a, string b) {
 	
 	string result = "";
 	for (int i = 0; i < a.size(); i++) {
-		// XOR and convert
-		int xored = a[i] ^ b[i];
-		// std::stringstream stream;
-		// stream << std::hex << xored;
-		// string temp = stream.str();
-		
-		// // pad with 0
-		// if (temp.size() < 2) { temp = "0" + temp; }
-		// result += temp;
+		unsigned char xored = a[i] ^ b[i];
 		result += xored;
 	}
 	return result;
@@ -307,31 +300,48 @@ int hamming_distance(string a, string b) {
 
 string AES_encrypt(string input, string key) {
 	assert(input.size() == 16 && key.size() == 16);
+	string input_t = (transpose(Matrix(input, 4))).str();
+	string key_t = (transpose(Matrix(key, 4))).str();
 	
 	// generate keys
-	vector<string> keys;
-	keys.push_back(key);
-	Matrix prev_key(key, 4);
-	for(int i = 0; i < 9; i++) {
-		Matrix new_key = sub_bytes(prev_key);
-		new_key = shift_rows(new_key);
-		new_key = mix_columns(new_key);
-		keys.push_back(new_key.str());
-		prev_key = new_key;
-	}
-	// last key does not include mix columns
-	Matrix last_key(prev_key.str(), 4);
-	last_key = sub_bytes(last_key);
-	last_key = shift_rows(last_key);
-	keys.push_back(last_key.str());
-	
-	// encrypt the plaintext with the 11 keys, 
-	// 1 initial, 10 with all 3 functions, and 1 last one without mix columns
-	assert(keys.size() == 11);
-	string result = input;
+	vector<string> keys = key_expansion(key_t);
 	for (int i = 0; i < keys.size(); i++) {
-		result = fixed_XOR(result, keys[i]);
+		std::cout << "Round "<< i << ":\t" << ASCII_to_hex(keys[i]) << "\n";
+	}
+	print_();
+	
+	// Round 0 - just add round key
+	string result = fixed_XOR(input_t, keys[0]);
+		std::cout << "Round 0:\n"; 
+		(Matrix(result, 4)).display_hex();
+		print_();
+	
+	// Round 1-9 - 4 steps
+	for (int i = 1; i <= 9; i++) {
+		Matrix curr_round(result, 4);
+		curr_round = sub_bytes(curr_round);
+			curr_round.display_hex();
+			print_();
+		curr_round = shift_rows(curr_round);
+			curr_round.display_hex();
+			print_();
+		curr_round = mix_columns(curr_round);
+			curr_round.display_hex();
+			print_();
+		result = fixed_XOR(curr_round.str(), keys[i]);
+			std::cout << "Round "<< i << ":\n";
+			(Matrix(result, 4)).display_hex();
+			print_();
 	}
 	
-	return result;
+	// Round 10 - 3 steps (no mix columns)
+	Matrix final_round(result, 4);
+	final_round = sub_bytes(final_round);
+	final_round = shift_rows(final_round);
+	result = fixed_XOR(final_round.str(), keys[10]);
+		std::cout << "Round 10:\n";
+		(Matrix(result, 4)).display_hex();
+		print_();
+	
+	return transpose(Matrix(result, 4)).str();
 }

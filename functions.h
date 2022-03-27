@@ -11,6 +11,7 @@ using std::vector;
 
 void print_(string input);
 void print_(int input);
+void print_();
 
 double freq_score(string text);
 
