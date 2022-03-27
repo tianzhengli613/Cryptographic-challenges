@@ -52,7 +52,7 @@ Matrix inverse_sub_bytes(Matrix initial);
 
 // Step 2: Shift rows
 Matrix shift_rows(Matrix initial);
-Matrix unshift_rows(Matrix initial);
+Matrix inverse_shift_rows(Matrix initial);
 
 // Step 3: Mix columns
 Matrix byte_multiplication(Matrix a, Matrix b);

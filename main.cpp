@@ -265,6 +265,8 @@ void challenge7() {
 	
 	// print_(result);
 	
+	// ===========================================================
+	
 	Matrix test_key("Thats my Kung Fu", 4);
 	
 	// test key expansion
@@ -288,21 +290,21 @@ void challenge7() {
 	sub_bytes_expected = "2045ef928fb73cb6b7b39d9f85b75a9d";
 	assert(ASCII_to_hex(sub_bytes_result.str()) == sub_bytes_expected);
 	
-	// test shift and unshift rows
+	// test shift and inverse shift rows
 	Matrix shift_rows_result = shift_rows(sub_bytes_result);
 	string shift_rows_expected = "2045ef92b73cb68f9d9fb7b39d85b75a";
 	assert(ASCII_to_hex(shift_rows_result.str()) == shift_rows_expected);
-	Matrix unshift_rows_result = unshift_rows(shift_rows_result);
+	Matrix unshift_rows_result = inverse_shift_rows(shift_rows_result);
 	assert(ASCII_to_hex(unshift_rows_result.str()) == ASCII_to_hex(sub_bytes_result.str()));
 	
 	string pre_shift = hex_to_ASCII("d4e0b81e27bfb44111985d52aef1e530");
 	shift_rows_result = shift_rows(Matrix(pre_shift, 4));
 	shift_rows_expected = "d4e0b81ebfb441275d52119830aef1e5";
 	assert(ASCII_to_hex(shift_rows_result.str()) == shift_rows_expected);
-	unshift_rows_result = unshift_rows(shift_rows_result);
+	unshift_rows_result = inverse_shift_rows(shift_rows_result);
 	assert(unshift_rows_result.str() == pre_shift);
 	
-	// test mix columns
+	// test mix columns and inverse mix columns
 	string mix_column_input = hex_to_ASCII("dbf201c6130a01c6532201c6455c01c6");
 	Matrix mix_column_result(mix_column_input, 4);
 	mix_column_result = mix_columns(mix_column_result);
@@ -314,6 +316,9 @@ void challenge7() {
 	mix_column_result = mix_columns(mix_column_result);
 	mix_column_expected = "04e0482866cbf8068119d326e59a7a4c";
 	assert(ASCII_to_hex(mix_column_result.str()) == mix_column_expected);
+	
+	string inv_mix_result = (inverse_mix_columns(Matrix(mix_column_result.str(), 4))).str();
+	assert(inv_mix_result == mix_column_input);
 	
 	// test matrix XOR
 	test_key = Matrix(hex_to_ASCII("a088232afa54a36cfe2c397617b13905"), 4);
@@ -329,5 +334,6 @@ void challenge7() {
 	string AES_expected_hex = "29c3505f571420f6402299b31a02d73a";
 	assert(ASCII_to_hex(AES_result) == AES_expected_hex);
 	
-	print_(ASCII_to_hex(AES_result));
+	string AES_decrypt_result = AES_decrypt(AES_result, key);
+	assert(AES_decrypt_result == plaintext);
 }

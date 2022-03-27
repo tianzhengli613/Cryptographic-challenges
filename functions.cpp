@@ -305,43 +305,74 @@ string AES_encrypt(string input, string key) {
 	
 	// generate keys
 	vector<string> keys = key_expansion(key_t);
-	for (int i = 0; i < keys.size(); i++) {
-		std::cout << "Round "<< i << ":\t" << ASCII_to_hex(keys[i]) << "\n";
-	}
-	print_();
+	// for (int i = 0; i < keys.size(); i++) {
+	// 	std::cout << "Round "<< i << ":\t" << ASCII_to_hex(keys[i]) << "\n";
+	// }
+	// print_();
 	
-	// Round 0 - just add round key
+	// round 0 - just add round key
 	string result = fixed_XOR(input_t, keys[0]);
-		std::cout << "Round 0:\n"; 
-		(Matrix(result, 4)).display_hex();
-		print_();
+		// std::cout << "Round 0:\n"; 
+		// (Matrix(result, 4)).display_hex();
+		// print_();
 	
-	// Round 1-9 - 4 steps
+	// round 1-9 - 4 steps
 	for (int i = 1; i <= 9; i++) {
 		Matrix curr_round(result, 4);
 		curr_round = sub_bytes(curr_round);
-			curr_round.display_hex();
-			print_();
+			// curr_round.display_hex();
+			// print_();
 		curr_round = shift_rows(curr_round);
-			curr_round.display_hex();
-			print_();
+			// curr_round.display_hex();
+			// print_();
 		curr_round = mix_columns(curr_round);
-			curr_round.display_hex();
-			print_();
+			// curr_round.display_hex();
+			// print_();
 		result = fixed_XOR(curr_round.str(), keys[i]);
-			std::cout << "Round "<< i << ":\n";
-			(Matrix(result, 4)).display_hex();
-			print_();
+			// std::cout << "Round "<< i << ":\n";
+			// (Matrix(result, 4)).display_hex();
+			// print_();
 	}
 	
-	// Round 10 - 3 steps (no mix columns)
+	// round 10 - 3 steps (no mix columns)
 	Matrix final_round(result, 4);
 	final_round = sub_bytes(final_round);
 	final_round = shift_rows(final_round);
 	result = fixed_XOR(final_round.str(), keys[10]);
-		std::cout << "Round 10:\n";
-		(Matrix(result, 4)).display_hex();
-		print_();
+		// std::cout << "Round 10:\n";
+		// (Matrix(result, 4)).display_hex();
+		// print_();
+	
+	return transpose(Matrix(result, 4)).str();
+}
+
+string AES_decrypt(string input, string key) {
+	assert(input.size() == 16 && key.size() == 16);
+	string input_t = (transpose(Matrix(input, 4))).str();
+	string key_t = (transpose(Matrix(key, 4))).str();
+	
+	// generate keys
+	vector<string> keys = key_expansion(key_t);
+	
+	// undo round 10
+	string result = fixed_XOR(input_t, keys[10]);
+	Matrix final_round(result, 4);
+	final_round = inverse_shift_rows(final_round);
+	final_round = inverse_sub_bytes(final_round);
+	result = final_round.str();
+	
+	// undo round 1-9
+	for (int i = 9; i >= 1; i--) {
+		result = fixed_XOR(result, keys[i]);
+		Matrix curr_round(result, 4);
+		curr_round = inverse_mix_columns(curr_round);
+		curr_round = inverse_shift_rows(curr_round);
+		curr_round = inverse_sub_bytes(curr_round);
+		result = curr_round.str();
+	}
+	
+	// undo round 0
+	result = fixed_XOR(result, keys[0]);
 	
 	return transpose(Matrix(result, 4)).str();
 }
