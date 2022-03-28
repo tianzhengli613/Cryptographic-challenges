@@ -90,7 +90,6 @@ string ASCII_to_base64(string input) {
 		block |= input[i + 1];
 		block <<= 8;
 		block |= input[i + 2];
-		
 		// split
 		unsigned char first = block >> 18;
 		unsigned char sec = block >> 12;
@@ -183,9 +182,7 @@ string fixed_XOR(string a, string b) {
 string repeating_key_XOR(string input, string key) {
 	// match key length to the input length by repeating
 	string new_key = key;
-	for (int i = 0; i < (input.size() - key.size()); i++) {
-        new_key += new_key[i];
-	}
+	for (int i = 0; i < (input.size() - key.size()); i++) { new_key += new_key[i]; }
 	// perform fixed XOR, since they are now equal lengths
 	return fixed_XOR(input, new_key);
 }
@@ -243,7 +240,7 @@ string get_single_byte_XOR_key(string input) {
 		string key = "";
 		unsigned char c = i;
 		key += c;
-		string candidate = hex_to_ASCII(repeating_key_XOR(input, key));
+		string candidate = repeating_key_XOR(input, key);
 		double score = freq_score(candidate);
 		
 		// find the largest score
@@ -257,7 +254,7 @@ string get_single_byte_XOR_key(string input) {
 
 string single_byte_XOR(string input) {
 	string key = get_single_byte_XOR_key(input);
-	return hex_to_ASCII(repeating_key_XOR(input, key));
+	return repeating_key_XOR(input, key);
 }
 
 string detect_single_byte_XOR(vector<string> input) {
@@ -375,4 +372,19 @@ string AES_decrypt(string input, string key) {
 	result = fixed_XOR(result, keys[0]);
 	
 	return transpose(Matrix(result, 4)).str();
+}
+
+string AES_ECB_decrypt(string filename, string key) {
+	// input is a file of base64 encrypted text
+	// convert to a vector of size 16 chunks
+	vector<string> split_vect = split_file(filename);
+	string decoded = "";
+	for (int i = 0; i < split_vect.size(); i++) { decoded += base64_to_ASCII(split_vect[i]); }
+	vector<string> decoded_chunks;
+	assert(decoded.size() % 16 == 0);
+	for (int i = 0; i < decoded.size(); i += 16) { decoded_chunks.push_back(decoded.substr(i, 16)); }
+	
+	string result = "";
+	for (int i = 0; i < decoded_chunks.size(); i++) { result += AES_decrypt(decoded_chunks[i], key); }
+	return result;
 }

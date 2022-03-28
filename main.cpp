@@ -18,15 +18,15 @@ void challenge7();
 void test_matrices();
 
 int main() {
-	// challenge1();
-	// challenge2();
-	// challenge3();
-	// challenge4();
-	// challenge5();
-	// challenge6();
-	challenge7();	// incomplete
+	challenge1();
+	challenge2();
+	challenge3();
+	challenge4();
+	challenge5();
+	challenge6();
+	challenge7();
 	
-	// test_matrices();
+	test_matrices();
 	
 	std::cout << "\n============================\n";
 	std::cout << "All assertions passed.\n";
@@ -35,13 +35,6 @@ int main() {
 }
 
 void test_matrices() {
-	// http://etutorials.org/Networking/802.11+security.+wi-fi+protected+access+and+802.11i/Appendixes/Appendix+A.+Overview+of+the+AES+Block+Cipher/Steps+in+the+AES+Encryption+Process/#:~:text=AES%20defines%20a%20table%20of,value%20from%20the%20substitution%20table.
-	// https://www.simplilearn.com/tutorials/cryptography-tutorial/aes-encryption
-	
-	// 1234567812345678
-	// thisisakeyofkeys
-	// YELLOW SUBMARINE
-	
 	// test all Matrix class functions
 	Matrix empty(3, 4);
 	assert(empty.horizontal_length() == 3);
@@ -189,14 +182,13 @@ void challenge1() {
 void challenge2() {
 	string a = "1c0111001f010100061a024b53535009181c";
 	string b = "686974207468652062756c6c277320657965";
-	string aa = hex_to_ASCII(a);
-	string bb = hex_to_ASCII(b);
-	string result = fixed_XOR(aa, bb);
+	string a_decoded = hex_to_ASCII(a);
+	string b_decoded = hex_to_ASCII(b);
+	string result = fixed_XOR(a_decoded, b_decoded);
 	string desired = "746865206b696420646f6e277420706c6179";
 	
-	assert(ASCII_to_hex(result) == desired);	// encode
-	assert(fixed_XOR(result, bb) == a);			// decode
-	
+	assert(ASCII_to_hex(result) == desired);			// encode
+	assert(fixed_XOR(result, b_decoded) == a_decoded);	// decode
 	std::cout << "Challenge 2: " << result << "\n";
 }
 
@@ -226,11 +218,11 @@ void challenge4() {
 void challenge5() {
 	string text = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
 	string key = "ICE";
-	string result = repeating_key_XOR(text, key);
+	string result = ASCII_to_hex(repeating_key_XOR(text, key));
 	string desired = "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f";
 	
-	assert(result == desired);													// encode
-	assert(text == hex_to_ASCII(repeating_key_XOR(hex_to_ASCII(result), key)));	// decode
+	assert(result == desired);										// encode
+	assert(text == repeating_key_XOR(hex_to_ASCII(result), key));	// decode
 	
 	std::cout << "Challenge 5: " << result << "\n\n";
 }
@@ -251,21 +243,20 @@ void challenge6() {
 	assert(result == desired);
 	
 	std::cout << "Challenge 6: " << result << "\n\n";
-	string deciphered = hex_to_ASCII(repeating_key_XOR(input, result));
+	string deciphered = repeating_key_XOR(input, result);
 	print_(deciphered);
 }
 
 // AES-128 in ECB mode
 void challenge7() {
-	// vector<string> split_vect = split_file("C7input.txt");
-	// string input = "";
-	// for (int i = 0; i < split_vect.size(); i++) { input += split_vect[i]; }
-	// string key = "YELLOW SUBMARINE";
-	// string result = AES_decrypt(input, key);
+	string key = "YELLOW SUBMARINE";
+	string result = AES_ECB_decrypt("c7input.txt", key);
 	
-	// print_(result);
+	std::cout << "Challenge 7: \n";
+	print_(result);
 	
 	// ===========================================================
+	// Tests for the secondary functions
 	
 	Matrix test_key("Thats my Kung Fu", 4);
 	
@@ -328,12 +319,11 @@ void challenge7() {
 	
 	// test AES
 	string plaintext = "Two One Nine Two";
-	string key = "Thats my Kung Fu";
-	string AES_result = AES_encrypt(plaintext, key);
-	// string AES_expected_hex = "29c3505f571420f6402299b31a02d73ab3e46f11ba8d2b97c18769449a89e868";
+	string AES_key = "Thats my Kung Fu";
+	string AES_result = AES_encrypt(plaintext, AES_key);
 	string AES_expected_hex = "29c3505f571420f6402299b31a02d73a";
 	assert(ASCII_to_hex(AES_result) == AES_expected_hex);
 	
-	string AES_decrypt_result = AES_decrypt(AES_result, key);
+	string AES_decrypt_result = AES_decrypt(AES_result, AES_key);
 	assert(AES_decrypt_result == plaintext);
 }
