@@ -1,3 +1,4 @@
+// by Tianzheng Li
 // clang++ main.cpp -o run functions.cpp matrix.cpp && ./run
 
 #include <iostream>
@@ -38,115 +39,6 @@ int main() {
 	return 0;
 }
 
-void test_matrices() {
-	// test all Matrix class functions
-	Matrix empty(3, 4);
-	assert(empty.horizontal_length() == 3);
-	assert(empty.vertical_length() == 4);
-	assert(empty.str() == "            ");
-	assert((empty.str()).size() == 12);
-	
-	Matrix a("thisisakeyofkeys", 8);
-	assert(a.str() == "thisisakeyofkeys");
-	assert(a.pos(1, 2) == 'o');
-	a.set('K', 0, 7);
-	a.set('O', 1, 2);
-	assert(a.str() == "thisisaKeyOfkeys");
-	
-	// test matrix set column
-	Matrix set_col_result("o1l2d3c4", 2);
-	Matrix new_column("NEWC", 1);
-	set_col_result = set_column(set_col_result, new_column, 0);
-	string set_col_expected = "N1E2W3C4";
-	assert(set_col_result.str() == set_col_expected);
-	// =====================================
-	
-	// Matrix XOR
-	Matrix b("YELLOW SUBMARINE", 8);
-	Matrix c = matrix_XOR(b, a);
-	c = matrix_XOR(c, a);
-	assert(c.str() == b.str());
-	
-	// test matrix dot
-	string e1_str = "";
-	unsigned char c1 = 1;
-	unsigned char c2 = 2;
-	unsigned char c3 = 3;
-	unsigned char c4 = 4;
-	unsigned char c5 = 5;
-	unsigned char c6 = 6;
-	e1_str += c1;
-	e1_str += c2;
-	e1_str += c3;
-	e1_str += c4;
-	e1_str += c5;
-	e1_str += c6;
-	Matrix e1(e1_str, 3);
-	
-	string e2_str = "";
-	c1 = 7;
-	c2 = 8;
-	c3 = 9;
-	c4 = 10;
-	c5 = 11;
-	c6 = 12;
-	e2_str += c1;
-	e2_str += c2;
-	e2_str += c3;
-	e2_str += c4;
-	e2_str += c5;
-	e2_str += c6;
-	Matrix e2(e2_str, 2);
-	
-	Matrix e3 = dot(e1, e2);
-	
-	string e3_expected_str = "";
-	c1 = 58;
-	c2 = 64;
-	c3 = 139;
-	c4 = 154;
-	e3_expected_str += c1;
-	e3_expected_str += c2;
-	e3_expected_str += c3;
-	e3_expected_str += c4;
-	Matrix e3_expected(e3_expected_str, 2);
-	
-	assert(e3.str() == e3_expected.str());
-	
-	string f1_str = e1_str + e2_str;
-	c1 = 13;
-	c2 = 14;
-	c3 = 15;
-	c4 = 16;
-	f1_str += c1;
-	f1_str += c2;
-	f1_str += c3;
-	f1_str += c4;
-	
-	Matrix f1(f1_str, 4);
-	Matrix f2(e1_str.substr(0, 4), 1);
-	Matrix f3 = dot(f1, f2);
-	
-	string f3_str = "";
-	c1 = 30;
-	c2 = 70;
-	c3 = 110;
-	c4 = 150;
-	f3_str += c1;
-	f3_str += c2;
-	f3_str += c3;
-	f3_str += c4;
-	Matrix f3_expected(f3_str, 1);
-	assert(f3.str() == f3_expected.str());
-	
-	// test matrix transpose
-	Matrix pre_transpose("123456", 3);
-	Matrix post_transpose = transpose(pre_transpose);
-	assert(post_transpose.str() == "142536");
-	assert(post_transpose.vertical_length() == pre_transpose.horizontal_length());
-	assert(post_transpose.horizontal_length() == pre_transpose.vertical_length());
-}
-
 // =======================================
 // Convert hex to base64
 void challenge1() {
@@ -156,6 +48,7 @@ void challenge1() {
 	
 	assert(result == desired);
 	
+	// test encode and decode for different lengths of padding
 	string test1 = "light work.";
 	string test2 = "light work";
 	string test3 = "light wor";
@@ -237,15 +130,18 @@ void challenge6() {
 	string b = "wokka wokka!!!";
 	assert(hamming_distance(a, b) == 37);
 	
+	// split file
 	vector<string> split_vect = split_file("C6input.txt");
 	string input = "";
 	for (int i = 0; i < split_vect.size(); i++) { input += split_vect[i]; }
 	
+	// get correct key
 	input = base64_to_ASCII(input);
 	string result = break_repeating_key_XOR(input);
 	string desired = "Terminator X: Bring the noise";
 	assert(result == desired);
 	
+	// print deciphered text
 	std::cout << "Challenge 6: " << result << "\n\n";
 	string deciphered = repeating_key_XOR(input, result);
 	print_(deciphered);
@@ -272,6 +168,7 @@ void challenge7() {
 	test_key_expansion = rot_word(test_key_expansion);
 	Matrix rot_word_expected(hex_to_ASCII("73206754"), 1);
 	assert(rot_word_expected.str() == test_key_expansion.str());
+	
 	Matrix sub_bytes_result = sub_bytes(Matrix(hex_to_ASCII("cf4f3c09"), 1));
 	string sub_bytes_expected = hex_to_ASCII("8a84eb01");
 	assert(sub_bytes_result.str() == sub_bytes_expected);
@@ -281,6 +178,7 @@ void challenge7() {
 	sub_bytes_result = sub_bytes(Matrix(hex_to_ASCII(pre_sub), 4));
 	sub_bytes_expected = "d4e0b81e27bfb44111985d52aef1e530";
 	assert(ASCII_to_hex(sub_bytes_result.str()) == sub_bytes_expected);
+	
 	Matrix inverse_sub_result = inverse_sub_bytes(sub_bytes_result);
 	assert(inverse_sub_result.str() == hex_to_ASCII(pre_sub));
 	
@@ -292,6 +190,7 @@ void challenge7() {
 	Matrix shift_rows_result = shift_rows(sub_bytes_result);
 	string shift_rows_expected = "2045ef92b73cb68f9d9fb7b39d85b75a";
 	assert(ASCII_to_hex(shift_rows_result.str()) == shift_rows_expected);
+	
 	Matrix unshift_rows_result = inverse_shift_rows(shift_rows_result);
 	assert(ASCII_to_hex(unshift_rows_result.str()) == ASCII_to_hex(sub_bytes_result.str()));
 	
@@ -299,6 +198,7 @@ void challenge7() {
 	shift_rows_result = shift_rows(Matrix(pre_shift, 4));
 	shift_rows_expected = "d4e0b81ebfb441275d52119830aef1e5";
 	assert(ASCII_to_hex(shift_rows_result.str()) == shift_rows_expected);
+	
 	unshift_rows_result = inverse_shift_rows(shift_rows_result);
 	assert(unshift_rows_result.str() == pre_shift);
 	
@@ -355,3 +255,63 @@ void challenge9() {
 	std::cout << "Challenge 9: " << result << "\n\n";
 }
 
+// test matrix functions
+void test_matrices() {
+	// test all Matrix class functions
+	Matrix empty(3, 4);
+	assert(empty.horizontal_length() == 3);
+	assert(empty.vertical_length() == 4);
+	assert(empty.str() == "            ");
+	assert((empty.str()).size() == 12);
+	
+	Matrix a("thisisakeyofkeys", 8);
+	assert(a.str() == "thisisakeyofkeys");
+	assert(a.pos(1, 2) == 'o');
+	a.set('K', 0, 7);
+	a.set('O', 1, 2);
+	assert(a.str() == "thisisaKeyOfkeys");
+	
+	// test matrix set column
+	Matrix set_col_result("o1l2d3c4", 2);
+	Matrix new_column("NEWC", 1);
+	set_col_result = set_column(set_col_result, new_column, 0);
+	string set_col_expected = "N1E2W3C4";
+	assert(set_col_result.str() == set_col_expected);
+	// =====================================
+	
+	// Matrix XOR
+	Matrix b("YELLOW SUBMARINE", 8);
+	Matrix c = matrix_XOR(b, a);
+	c = matrix_XOR(c, a);
+	assert(c.str() == b.str());
+	
+	// test matrix dot
+	unsigned char input1[6] = {1, 2, 3, 4, 5, 6};
+	Matrix e1(input1, 6, 3);
+	
+	unsigned char input2[6] = {7, 8, 9, 10, 11, 12};
+	Matrix e2(input2, 6, 2);
+	
+	Matrix e3 = dot(e1, e2);
+	
+	unsigned char input3[4] = {58, 64, 139, 154};
+	Matrix e3_expected(input3, 4, 2);
+	
+	assert(e3.str() == e3_expected.str());
+	
+	unsigned char input4[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+	Matrix f1(input4, 16, 4);
+	Matrix f2((e1.str()).substr(0, 4), 1);
+	Matrix f3 = dot(f1, f2);
+	
+	unsigned char input5[4] = {30, 70, 110, 150};
+	Matrix f3_expected(input5, 4, 1);
+	assert(f3.str() == f3_expected.str());
+	
+	// test matrix transpose
+	Matrix pre_transpose("123456", 3);
+	Matrix post_transpose = transpose(pre_transpose);
+	assert(post_transpose.str() == "142536");
+	assert(post_transpose.vertical_length() == pre_transpose.horizontal_length());
+	assert(post_transpose.horizontal_length() == pre_transpose.vertical_length());
+}
