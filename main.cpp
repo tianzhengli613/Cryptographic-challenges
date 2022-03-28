@@ -15,6 +15,7 @@ void challenge5();
 void challenge6();
 void challenge7();
 void challenge8();
+void challenge9();
 
 void test_matrices();
 
@@ -27,6 +28,7 @@ int main() {
 	challenge6();
 	challenge7();
 	challenge8();
+	challenge9();
 	
 	test_matrices();
 	
@@ -343,5 +345,13 @@ void challenge8() {
 	assert(result == expected);
 	
 	std::cout << "Challenge 8: \n" << result << "\n\n";
+}
+
+// PKCS#7 padding
+void challenge9() {
+	string initial = "YELLOW SUBMARINE";
+	string result = PKCS_7_padding(initial, 20);
+	
+	std::cout << "Challenge 9: " << result << "\n\n";
 }
 

@@ -411,3 +411,17 @@ string detect_AES_ECB(vector<string> input) {
 	}
 	return input[index];
 }
+
+string PKCS_7_padding(string initial, int length) {
+	assert(length > initial.size());
+	int padding_length = length - initial.size();
+	string padding = "\\x";
+	unsigned char c = padding_length;
+	string hex = "";
+	hex += c;
+	padding += ASCII_to_hex(hex);
+	
+	string result = initial;
+	for(int i = 0; i < padding_length; i++) { result += padding; }
+	return result;
+}
