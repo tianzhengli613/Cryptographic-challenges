@@ -34,4 +34,6 @@ int hamming_distance(string a, string b);
 
 string AES_encrypt(string input, string key);
 string AES_decrypt(string input, string key);
-string AES_ECB_decrypt(string filename, string key);
+string AES_ECB_decrypt(string input, string key);
+int detect_repititions(string input);
+string detect_AES_ECB(vector<string> input);

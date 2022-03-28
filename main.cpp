@@ -14,6 +14,7 @@ void challenge4();
 void challenge5();
 void challenge6();
 void challenge7();
+void challenge8();
 
 void test_matrices();
 
@@ -25,6 +26,7 @@ int main() {
 	challenge5();
 	challenge6();
 	challenge7();
+	challenge8();
 	
 	test_matrices();
 	
@@ -250,7 +252,10 @@ void challenge6() {
 // AES-128 in ECB mode
 void challenge7() {
 	string key = "YELLOW SUBMARINE";
-	string result = AES_ECB_decrypt("c7input.txt", key);
+	vector<string> split_vect = split_file("c7input.txt");
+	string decoded = "";
+	for (int i = 0; i < split_vect.size(); i++) { decoded += base64_to_ASCII(split_vect[i]); }
+	string result = AES_ECB_decrypt(decoded, key);
 	
 	std::cout << "Challenge 7: \n";
 	print_(result);
@@ -327,3 +332,16 @@ void challenge7() {
 	string AES_decrypt_result = AES_decrypt(AES_result, AES_key);
 	assert(AES_decrypt_result == plaintext);
 }
+
+// Detect AES ECB
+void challenge8() {
+	vector<string> split_vect = split_file("c8input.txt");
+	for (int i = 0; i < split_vect.size(); i++) { split_vect[i] = hex_to_ASCII(split_vect[i]); }
+	
+	string result = ASCII_to_hex(detect_AES_ECB(split_vect));
+	string expected = "d880619740a8a19b7840a8a31c810a3d08649af70dc06f4fd5d2d69c744cd283e2dd052f6b641dbf9d11b0348542bb5708649af70dc06f4fd5d2d69c744cd2839475c9dfdbc1d46597949d9c7e82bf5a08649af70dc06f4fd5d2d69c744cd28397a93eab8d6aecd566489154789a6b0308649af70dc06f4fd5d2d69c744cd283d403180c98c8f6db1f2a3f9c4040deb0ab51b29933f2c123c58386b06fba186a";
+	assert(result == expected);
+	
+	std::cout << "Challenge 8: \n" << result << "\n\n";
+}
+

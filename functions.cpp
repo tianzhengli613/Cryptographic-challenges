@@ -374,17 +374,40 @@ string AES_decrypt(string input, string key) {
 	return transpose(Matrix(result, 4)).str();
 }
 
-string AES_ECB_decrypt(string filename, string key) {
-	// input is a file of base64 encrypted text
+string AES_ECB_decrypt(string input, string key) {
 	// convert to a vector of size 16 chunks
-	vector<string> split_vect = split_file(filename);
-	string decoded = "";
-	for (int i = 0; i < split_vect.size(); i++) { decoded += base64_to_ASCII(split_vect[i]); }
-	vector<string> decoded_chunks;
-	assert(decoded.size() % 16 == 0);
-	for (int i = 0; i < decoded.size(); i += 16) { decoded_chunks.push_back(decoded.substr(i, 16)); }
+	assert(input.size() % 16 == 0);
+	vector<string> chunks;
+	for (int i = 0; i < input.size(); i += 16) { chunks.push_back(input.substr(i, 16)); }
 	
 	string result = "";
-	for (int i = 0; i < decoded_chunks.size(); i++) { result += AES_decrypt(decoded_chunks[i], key); }
+	for (int i = 0; i < chunks.size(); i++) { result += AES_decrypt(chunks[i], key); }
 	return result;
+}
+
+int detect_repititions(string input) {
+	assert(input.size() % 16 == 0);
+	int repititions = 0;
+	for (int i = 0; i < input.size() - 16; i += 16) {
+		string current = input.substr(i, 16);
+		for (int j = i + 16; j < input.size(); j += 16) {
+			string compare = input.substr(j, 16);
+			if (current == compare) { repititions++; }
+		}
+	}
+	return repititions;
+}
+
+string detect_AES_ECB(vector<string> input) {
+	// look for repitions in each chunk of size 16
+	int most_repitions = -1;
+	int index = -1;
+	for (int i = 0; i < input.size(); i++) {
+		int repition = detect_repititions(input[i]);
+		if (repition > most_repitions) {
+			most_repitions = repition;
+			index = i;
+		}
+	}
+	return input[index];
 }
