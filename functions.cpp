@@ -385,19 +385,6 @@ string AES_ECB_decrypt(string input, string key) {
 	return result;
 }
 
-int detect_repititions(string input) {
-	assert(input.size() % 16 == 0);
-	int repititions = 0;
-	for (int i = 0; i < input.size() - 16; i += 16) {
-		string current = input.substr(i, 16);
-		for (int j = i + 16; j < input.size(); j += 16) {
-			string compare = input.substr(j, 16);
-			if (current == compare) { repititions++; }
-		}
-	}
-	return repititions;
-}
-
 string detect_AES_ECB(vector<string> input) {
 	// look for repitions in each chunk of size 16
 	int most_repitions = -1;
@@ -412,16 +399,39 @@ string detect_AES_ECB(vector<string> input) {
 	return input[index];
 }
 
+int detect_repititions(string input) {
+	assert(input.size() % 16 == 0);
+	int repititions = 0;
+	for (int i = 0; i < input.size() - 16; i += 16) {
+		string current = input.substr(i, 16);
+		for (int j = i + 16; j < input.size(); j += 16) {
+			string compare = input.substr(j, 16);
+			if (current == compare) { repititions++; }
+		}
+	}
+	return repititions;
+}
+
+string AES_CBC_decrypt(string input, string key, string init_vect) {
+	// pad key
+	
+	// first round
+		// AES decrypt
+		// XOR IV
+		
+	// rest of rounds
+		// AES decrypt 
+		// XOR with prev cipher text
+		
+	// add altogether
+}
+
 string PKCS_7_padding(string initial, int length) {
 	assert(length > initial.size());
 	int padding_length = length - initial.size();
-	string padding = "\\x";
 	unsigned char c = padding_length;
-	string hex = "";
-	hex += c;
-	padding += ASCII_to_hex(hex);
 	
 	string result = initial;
-	for(int i = 0; i < padding_length; i++) { result += padding; }
+	for(int i = 0; i < padding_length; i++) { result += padding_length; }
 	return result;
 }
